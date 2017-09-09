@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info
+        organisation="mm"
+        module="mm.fritz"
+        status="integration">
+	</info>
+
+    <configurations defaultconfmapping="compile->default">
+        <conf name="compile" description="Required to compile application"/>
+        <conf name="runtime" description="Additional run-time dependencies" extends="compile"/>
+        <conf name="test"    description="Required for test only" extends="runtime"/>
+    </configurations>
+
+    <publications>
+        <artifact name="mm-fritz" type="jar" ext="jar"/>
+    </publications>
+
+	<dependencies>
+	   	<dependency org="org.apache.directory.api" name="api-all" rev="+"/>
+
+	   	<dependency org="net.sourceforge.htmlunit" name="htmlunit" rev="+"/>
+
+	   	<dependency org="mysql" name="mysql-connector-java" rev="5+"/>
+
+  		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="+"/>
+  		<dependency org="org.apache.logging.log4j" name="log4j-slf4j-impl" rev="+"/>
+
+	   	<dependency org="org.apache.commons" name="commons-lang3" rev="+"/>
+
+   	    <dependency org="junit" name="junit" rev="4+"/>
+		<dependency org="org.hamcrest" name="hamcrest-core" rev="+"/>
+
+   	    <dependency org="javax.servlet" name="javax.servlet-api" rev="+"/>
+	</dependencies>
+</ivy-module>

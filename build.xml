@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mm-fritz" default="default" xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<target name="default" depends="clean,war">
+
+	</target>
+
+	<target name="conf" description="retrieve dependencies with ivy">
+		<ivy:settings/>
+	</target>
+
+	<target name="resolve" depends="conf" description="retrieve dependencies with ivy">
+		<ivy:resolve />
+		<ivy:cachepath pathid="main.classpath" conf="compile"/>
+        <property name="d" refid="main.classpath"/>
+		<echo>main.classpath: ${d}</echo>
+		<ivy:cachefileset setid="runtime.fileset" conf="runtime"/>
+        <property name="e" refid="runtime.fileset"/>
+		<echo>runtime.fileset: ${e}</echo>
+	</target>
+
+	<target name="lib" depends="conf" description="retrieve dependencies with ivy">
+		<!--<ivy:retrieve />-->
+	</target>
+
+	<target name="clean">
+		<delete>
+			<fileset dir="bin">
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="compile" depends="resolve">
+		<javac srcdir="src" destdir="bin" classpathref="main.classpath" />
+	</target>
+
+	<target name="war" depends="compile,lib">
+		<war destfile="mm-fritz.war" webxml="web/WEB-INF/web.xml">
+			<fileset dir="web" />
+			<classes dir="src">
+				<include name="log4j2.xml"/>
+			</classes>
+			<classes dir="bin" />
+			
+			<!-- flatten the directory structure of ivy -->
+			<mappedresources>
+			      <restrict>
+			        <fileset refid="runtime.fileset"/>
+			        <type type="file"/>
+			      </restrict>
+			      <chainedmapper>
+			        <flattenmapper/>
+			        <globmapper from="*" to="WEB-INF/lib/*"/>
+			      </chainedmapper>
+			    </mappedresources>
+			<!-- <lib refid="compile.fileset" /> -->
+		</war>
+	</target>
+
+</project>

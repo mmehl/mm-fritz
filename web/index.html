@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Minecraft freigeben</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+				$("#start").click(
+						function() {
+							$("#out").html("Minecraft wird frei gegeben. Bitte warten....");
+							$.ajax({
+								url : 'fritz',
+								dataType : 'text',
+								data : {
+									pass : $("#pass").val(),
+									user : $("#user").val(),
+									minutes : $("#minutes").val()
+								},
+								type : 'GET'
+							})
+							.done(function(text) {
+									$("#out").html(text);
+							})
+							.fail(function(request, textStatus, errorThrown) {
+									$("#out").html("error: responseText: " + request.responseText + " , textStatus: "+textStatus+",  errorThrown: "+errorThrown);
+							})
+							.always(function(request, textStatus) {
+							})
+						});
+			});
+</script>
+<link rel="stylesheet" id="mm-css" href="mm.css" type="text/css" media="all">
+</head>
+<body>
+	<h1>Minecraft freigeben</h1>
+
+	<table>
+	<tr>
+		<th>User</th>
+		<td><input id="user" name="user" size="40" type="input" /></td>
+	</tr>
+	<tr>
+		<th>Passwort</th>
+		<td><input id="pass" name="pass" size="40" type="password" /></td>
+	</tr>
+	<tr>
+		<th>Minuten (optional)</th>
+		<td><input id="minutes" name="minutes" size="40" type="input" /></td>
+	</tr>
+	</table>
+	<input id="start" name="start" type="button" value="Start" />
+	<div id="out" class="outputTextArea"></div>
+</body>
+</html>
