@@ -19,6 +19,10 @@
 		<echo>runtime.fileset: ${e}</echo>
 	</target>
 
+	<target name="report" depends="resolve" description="ivy">
+		<ivy:report todir="report" />
+	</target>
+
 	<target name="lib" depends="conf" description="retrieve dependencies with ivy">
 		<!--<ivy:retrieve />-->
 	</target>

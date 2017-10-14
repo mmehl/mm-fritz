@@ -2,3 +2,6 @@
 /mm.fritz/
 /lib/
 /mm-fritz.war
+/logs/
+/.classpath
+/.project
