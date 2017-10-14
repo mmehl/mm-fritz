@@ -17,13 +17,17 @@ limitations under the License.
 package mm.fritz;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
-import org.apache.directory.api.ldap.model.cursor.EntryCursor;
-import org.apache.directory.api.ldap.model.entry.Entry;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.message.SearchScope;
-import org.apache.directory.ldap.client.api.LdapConnection;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.ldap.LdapContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,39 +57,54 @@ public class AuthenticationManager {
 	}
 
 	Authentication tryLogin(String uid, String pass) {
-		LOG.debug("tryLogin {}",uid);
-		LdapConnection connection = new LdapNetworkConnection( LDAP_Server, LDAP_Port );
-		
-			try {
-				connection.bind("uid="+uid+","+LDAP_User,pass);
-			} catch (LdapException e1) {
-				LOG.error("bind failed",e1);
-				try {
-					connection.close();
-				} catch (IOException e) {
-					LOG.warn("close failed",e);
-				}
-				return Authentication.LOGIN_ERROR;
-			}
-			try {
-			// "(objectclass=*)" 
-		    EntryCursor cursor = connection.search( LDAP_UserGroup, "(memberUid="+uid+")", SearchScope.OBJECT );
+		Hashtable<String, Object> env = new Hashtable<String, Object>();
+		env.put(Context.INITIAL_CONTEXT_FACTORY, 
+		        "com.sun.jndi.ldap.LdapCtxFactory");
+		env.put(Context.PROVIDER_URL, "ldap://"+LDAP_Server+":"+LDAP_Port);
+		env.put(Context.SECURITY_PRINCIPAL, "uid="+uid+","+LDAP_User);
+		env.put(Context.SECURITY_CREDENTIALS, pass);
+		try {
 		    Authentication found=Authentication.NO_MINECRAFT_USER;
-		    for (Entry entry : cursor) {
-		    	found=Authentication.MINECRAFT_USER;
-		        // System.out.println( entry );
-		    }
-		    cursor = connection.search( LDAP_AdminGroup, "(memberUid="+uid+")", SearchScope.OBJECT );
-		    for (Entry entry : cursor) {
-		    	found=Authentication.MINECRAFT_ADMIN;
-		        // System.out.println( entry );
-		    }
+		    Context ctx = (Context) new InitialContext(env);
+		    
+		    LdapContext userGroup = (LdapContext) ctx.lookup(LDAP_UserGroup);
+			Attributes users = userGroup.getAttributes("", new String[] {"memberUid"});
+
+			for (NamingEnumeration<? extends Attribute> ae = users.getAll(); ae.hasMore();) {
+			    Attribute attr = ae.next();
+			    NamingEnumeration<String> e = (NamingEnumeration<String>) attr.getAll();
+			    while (e.hasMore()) {
+			    	String val = e.next();
+			    	LOG.debug("val {}",val);
+					if (val.equals(uid)) {
+				    	found=Authentication.MINECRAFT_USER;
+					}
+				}
+			}
+			
+
+		    LdapContext adminGroup = (LdapContext) ctx.lookup(LDAP_AdminGroup);
+			Attributes admins = adminGroup.getAttributes("", new String[] {"memberUid"});
+
+			for (NamingEnumeration<? extends Attribute> ae = admins.getAll(); ae.hasMore();) {
+			    Attribute attr = ae.next();
+			    NamingEnumeration<String> e = (NamingEnumeration<String>) attr.getAll();
+			    while (e.hasMore()) {
+			    	String val = e.next();
+			    	LOG.debug("val {}",val);
+					if (val.equals(uid)) {
+				    	found=Authentication.MINECRAFT_ADMIN;
+					}
+				}
+			}
+
 	    	LOG.debug("found: {}",found);
-		    connection.close();
 			return found;
-		} catch (IOException | LdapException e) {
-			LOG.error("ex",e);
+		} catch (NamingException e) {
+			LOG.error("Naming Exception",e);
+			return Authentication.LOGIN_ERROR;	
 		}
-		return Authentication.ERROR;
+
 	}
+
 }

@@ -39,9 +39,9 @@ public class TestData {
 		Authentication isOk;
 		isOk = auth.tryLogin("invalid","pass");
 		assert isOk == Authentication.LOGIN_ERROR;
-		isOk = auth.tryLogin("user","pass");
+		isOk = auth.tryLogin("user","user");
 		assert isOk == Authentication.MINECRAFT_USER;
-		isOk = auth.tryLogin("admin","pass");
+		isOk = auth.tryLogin("admin","admin");
 		assert isOk == Authentication.MINECRAFT_ADMIN;
 	}
 }
