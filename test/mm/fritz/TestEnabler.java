@@ -23,8 +23,10 @@ public class TestEnabler {
 	public void testEnable() throws Exception {
 		PropertyManager prop = new PropertyManager();
 		EnableDisableMinecraft em = new EnableDisableMinecraft(prop);
-		em.enableMinecraft();
-		em.disableMinecraft();
+		boolean ok = em.enableMinecraft();
+		if (ok) {
+			em.disableMinecraft();
+		}
 		em.close();
 	}
 

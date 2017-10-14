@@ -30,28 +30,34 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 public class DatabaseManager {
 
 	private static Logger LOG=LoggerFactory.getLogger(DatabaseManager.class);
-	private MysqlDataSource dataSource;
 
 	private final String USER;
 	private final String PASS;
 	private final String SERVER;
 	private final String DB;
 
+	private MysqlDataSource dataSource;
+
 	public DatabaseManager(PropertyManager prop) {
 		USER = prop.getProperty("mm.fritz.db.user", "user");
 		PASS = prop.getProperty("mm.fritz.db.pass", "pass");
 		SERVER = prop.getProperty("mm.fritz.db.server", "localhost");
 		DB = prop.getProperty("mm.fritz.db.db", "db");
+		initDatasource();
+	}
 
+	private void initDatasource() {
 		dataSource = new MysqlDataSource();
 		dataSource.setUser(USER);
 		dataSource.setPassword(PASS);
 		dataSource.setServerName(SERVER);
 		dataSource.setDatabaseName(DB);
+
+		dataSource.setAutoReconnect(true);
 	}
 
 	public Boolean tryStart(String user) {
-		LOG.debug("tryStart");
+		LOG.debug("tryStart {}",user);
 		Connection con=null;
 		try {
 			con = dataSource.getConnection();
@@ -61,9 +67,10 @@ public class DatabaseManager {
 			statement.setString(2,user);
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next()) {
-				LOG.debug("tryStart ok");
+				LOG.debug("tryStart {}: ok", user);
 				return true;
 			}
+			LOG.debug("tryStart {}: not ok", user);
 			statement.close();
 			try {
 				statement = con.prepareStatement("INSERT INTO minecraft (timestamp, flag, user) VALUES (?,?,?)");
@@ -94,7 +101,7 @@ public class DatabaseManager {
 				}
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.debug("sql exception",e);
 			return false;
 		} finally {
 			try {
@@ -123,6 +130,7 @@ public class DatabaseManager {
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				LOG.error("sql failed",e);
+				// ignore
 			} finally {
 				try {
 					statement.close();
@@ -137,7 +145,8 @@ public class DatabaseManager {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.error("sql failed",e);
+			// ignore
 		} finally {
 			try {
 				if (con != null) con.close();

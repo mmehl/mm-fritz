@@ -25,6 +25,14 @@ public class PropertyManager extends Properties {
 		}
 		if (in == null) {
 			try {
+				in = new FileInputStream("/opt/mm-fritz.properties");
+			} catch (Exception e) {
+				LOG.debug("property error",e);
+				// ignore
+			}
+		}
+		if (in == null) {
+			try {
 				in = AuthenticationManager.class.getResourceAsStream("mm-fritz.properties");
 			} catch (Exception e) {
 				LOG.debug("property error",e);

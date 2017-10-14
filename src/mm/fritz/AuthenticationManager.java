@@ -73,14 +73,14 @@ public class AuthenticationManager {
 		    Authentication found=Authentication.NO_MINECRAFT_USER;
 		    for (Entry entry : cursor) {
 		    	found=Authentication.MINECRAFT_USER;
-		        System.out.println( entry );
+		        // System.out.println( entry );
 		    }
-	    	LOG.debug("found: {}",found);
 		    cursor = connection.search( LDAP_AdminGroup, "(memberUid="+uid+")", SearchScope.OBJECT );
 		    for (Entry entry : cursor) {
 		    	found=Authentication.MINECRAFT_ADMIN;
-		        System.out.println( entry );
+		        // System.out.println( entry );
 		    }
+	    	LOG.debug("found: {}",found);
 		    connection.close();
 			return found;
 		} catch (IOException | LdapException e) {

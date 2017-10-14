@@ -27,6 +27,7 @@
 
   		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="+"/>
   		<dependency org="org.apache.logging.log4j" name="log4j-slf4j-impl" rev="+"/>
+	   	<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.7+"/>
 
 	   	<dependency org="org.apache.commons" name="commons-lang3" rev="+"/>
 

@@ -39,7 +39,9 @@ import mm.fritz.AuthenticationManager.Authentication;
 		private DatabaseManager db;
 		private static final long serialVersionUID = 1L;
 		private static Logger LOG=LoggerFactory.getLogger(WebApp.class);
-		private PropertyManager prop;
+		private PropertyManager prop=null;
+		final static int MAX = 35;
+		private ScheduledExecutorService scheduler=null;
 
 		@Override
 		public void init(ServletConfig config) throws ServletException {
@@ -50,9 +52,14 @@ import mm.fritz.AuthenticationManager.Authentication;
 			auth = new AuthenticationManager(prop);
 			db = new DatabaseManager(prop);
 		}
+		@Override
+		public void destroy() {
+			scheduler.shutdown();
+			scheduler = null;
+			prop = null;
+			db = null;
+		}
 
-		final static int MAX = 35;
-		private ScheduledExecutorService scheduler;
 
 		protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 			LOG.debug("doGet");
@@ -112,7 +119,11 @@ import mm.fritz.AuthenticationManager.Authentication;
 				return;
 			}
 			try {
-				em.enableMinecraft();
+				boolean ok = em.enableMinecraft();
+				if (!ok) {
+					pw.println("<p>Freigabe fehlgeschlagen</p>");
+					return;
+				}
 				scheduler.schedule(() -> {
 					try {
 						em.disableMinecraft();

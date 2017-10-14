@@ -76,22 +76,30 @@ public class EnableDisableMinecraft {
 			page = hbutton.click();
 		}
 
-		public void enableMinecraft() throws Exception {
+		public boolean enableMinecraft() throws Exception {
 	        LOG.debug("enable");
 		        step2Filter();
 		        step3Zugangsprofile();
 		        step4StandardProfile();
-		        step5aEnableMinecraft();
+		        boolean ok = step5aEnableMinecraft();
+		        if (!ok) {
+		        	return false;
+		        }
 		        step6Ok();
+		        return true;
 		}
 
-		public void disableMinecraft() throws Exception {
+		public boolean disableMinecraft() throws Exception {
 	        LOG.debug("disable");
 		        step2Filter();
 		        step3Zugangsprofile();
 		        step4StandardProfile();
-		        step5bDisableMinecraft();
+		        boolean ok = step5bDisableMinecraft();
+		        if (!ok) {
+		        	return false;
+		        }
 		        step6Ok();
+		        return true;
 		}
 
 
@@ -115,37 +123,39 @@ public class EnableDisableMinecraft {
 			page = applyButton.click();
 		}
 
-		public void step5bDisableMinecraft() throws Exception {
+		public boolean step5bDisableMinecraft() throws Exception {
 	        LOG.debug("5a-DisableMinecraft");
 			// <select id="uiNetappsSelect" name="choosenetapps">
 			// <option value="9">                 Minecraft              </option>
 			List<Object> options = page.getByXPath("//select[@id='uiNetappsSelect']/option[normalize-space()='Minecraft']");
 			if (options.size()!=1) {
 				LOG.error("no Minecraft option");
-				throw new Exception("Already disabled");
+				return false;
 			}
 			HtmlOption applyButton = (HtmlOption) options.get(0);
 			page = applyButton.click();
+			return true;
 		}
 
-		public void step5aEnableMinecraft() throws Exception {
+		public boolean step5aEnableMinecraft() throws Exception {
 	        LOG.debug("5a-EnableMinecraft");
 			// suche nach delete Minecraft
 			List<Object> deleteButtons = page.getByXPath("//tr[normalize-space(td)='Minecraft']/td/button");
 			if (deleteButtons.size()!=1) {
-				LOG.error("deleteButtons.size(): {}",deleteButtons.size());
-				throw new Exception("Already enabled");
+				LOG.error("deleteButtons.size()!=1: {}; Minecraft already enabled.",deleteButtons.size());
+				return false;
 			}
 			HtmlButton deleteMinecraft = (HtmlButton) deleteButtons.get(0);
-			LOG.debug("deleteMinecraft {}"+deleteMinecraft.asXml());
+			LOG.debug("deleteMinecraft {}",deleteMinecraft.asXml());
 			page = deleteMinecraft.click();
+			return true;
 		}
 
 		public void step4StandardProfile() throws IOException {
 	        LOG.debug("4-StandardProfil");
 			// suche nach <button type="submit" name="edit" value="filtprof1" class="icon edit" title="Bearbeiten">
 			HtmlButton btn = (HtmlButton) page.getByXPath("//tr[td/@datalabel='Standard']/td/button[@name='edit']").get(0);
-			LOG.debug("btn {}"+btn.asXml());
+			LOG.debug("btn {}",btn.asXml());
 			page = btn.click();
 		}
 
