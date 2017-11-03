@@ -121,8 +121,7 @@ import mm.fritz.AuthenticationManager.Authentication;
 			try {
 				boolean ok = em.enableMinecraft();
 				if (!ok) {
-					pw.println("<p>Freigabe fehlgeschlagen</p>");
-					return;
+					pw.println("<p>Minecraft war schon freigegeben</p>");
 				}
 				scheduler.schedule(() -> {
 					try {
