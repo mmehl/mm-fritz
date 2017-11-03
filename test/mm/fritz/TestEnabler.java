@@ -16,18 +16,35 @@ limitations under the License.
 package mm.fritz;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestEnabler {
+	static Logger LOG = LoggerFactory.getLogger(TestEnabler.class);
 
 	@Test
-	public void testEnable() throws Exception {
+	public void testEnableDisable() throws Exception {
 		PropertyManager prop = new PropertyManager();
 		EnableDisableMinecraft em = new EnableDisableMinecraft(prop);
 		boolean ok = em.enableMinecraft();
-		if (ok) {
-			em.disableMinecraft();
-		}
+		LOG.debug("enable: {}",ok);
+		ok=em.disableMinecraft();
+		LOG.debug("disable: {}",ok);
 		em.close();
 	}
 
+	@Test
+	public void testEnable2() throws Exception {
+		PropertyManager prop = new PropertyManager();
+		EnableDisableMinecraft em = new EnableDisableMinecraft(prop);
+		boolean ok = em.enableMinecraft();
+		LOG.debug("enable1: {}",ok);
+		ok = em.enableMinecraft();
+		LOG.debug("enable2: {}",ok);
+		ok = em.disableMinecraft();
+		LOG.debug("disable1: {}",ok);
+		ok = em.disableMinecraft();
+		LOG.debug("disable2: {}",ok);
+		em.close();
+	}
 }

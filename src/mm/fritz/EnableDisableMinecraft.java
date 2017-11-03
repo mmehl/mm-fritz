@@ -129,7 +129,13 @@ public class EnableDisableMinecraft {
 			// <option value="9">                 Minecraft              </option>
 			List<Object> options = page.getByXPath("//select[@id='uiNetappsSelect']/option[normalize-space()='Minecraft']");
 			if (options.size()!=1) {
-				LOG.error("no Minecraft option");
+				LOG.debug("Minecraft maybe already disabled");
+				List<Object> deleteButtons = page.getByXPath("//tr[normalize-space(td)='Minecraft']/td/button");
+				if (deleteButtons.size()!=1) {
+					LOG.error("no delete button and no enable option");
+					throw new Error("no delete button and no enable option");
+				}
+				LOG.debug("Minecraft already disabled");
 				return false;
 			}
 			HtmlOption applyButton = (HtmlOption) options.get(0);
@@ -142,7 +148,13 @@ public class EnableDisableMinecraft {
 			// suche nach delete Minecraft
 			List<Object> deleteButtons = page.getByXPath("//tr[normalize-space(td)='Minecraft']/td/button");
 			if (deleteButtons.size()!=1) {
-				LOG.error("deleteButtons.size()!=1: {}; Minecraft already enabled.",deleteButtons.size());
+				LOG.debug("Minecraft maybe already enabled.");
+				List<Object> options = page.getByXPath("//select[@id='uiNetappsSelect']/option[normalize-space()='Minecraft']");
+				if (options.size()!=1) {
+					LOG.error("no delete button and no enable option");
+					throw new Error("no delete button and no enable option");
+				}
+				LOG.debug("Minecraft already enabled.");
 				return false;
 			}
 			HtmlButton deleteMinecraft = (HtmlButton) deleteButtons.get(0);
