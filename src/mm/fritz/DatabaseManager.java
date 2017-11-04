@@ -40,9 +40,13 @@ public class DatabaseManager {
 
 	public DatabaseManager(PropertyManager prop) {
 		USER = prop.getProperty("mm.fritz.db.user", "user");
+		LOG.debug("user {}",USER);
 		PASS = prop.getProperty("mm.fritz.db.pass", "pass");
+		LOG.debug("pass {}",PASS);
 		SERVER = prop.getProperty("mm.fritz.db.server", "localhost");
+		LOG.debug("server {}",SERVER);
 		DB = prop.getProperty("mm.fritz.db.db", "db");
+		LOG.debug("db {}",DB);
 		initDatasource();
 	}
 
@@ -72,12 +76,7 @@ public class DatabaseManager {
 			}
 			LOG.debug("tryStart {}: not ok", user);
 			statement.close();
-			try {
-				statement = con.prepareStatement("INSERT INTO minecraft (timestamp, flag, user) VALUES (?,?,?)");
-			} catch (SQLException e) {
-				LOG.error("get connection failed",e);
-				return false;
-			}
+			statement = con.prepareStatement("INSERT INTO minecraft (timestamp, flag, user) VALUES (?,?,?)");
 			java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTimeInMillis());
 			try {
 				statement.setTimestamp(1, sqlTimestamp);
@@ -85,9 +84,6 @@ public class DatabaseManager {
 				statement.setString(3, user);
 				statement.executeUpdate();
 				statement.close();
-			} catch (SQLException e) {
-				LOG.error("sql failed",e);
-				return false;
 			} finally {
 				try {
 					statement.close();
@@ -102,7 +98,7 @@ public class DatabaseManager {
 			}
 		} catch (SQLException e) {
 			LOG.debug("sql exception",e);
-			return false;
+			throw new Error(e);
 		} finally {
 			try {
 				if (con != null) con.close();

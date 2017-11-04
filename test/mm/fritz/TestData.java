@@ -22,6 +22,10 @@ import mm.fritz.AuthenticationManager.Authentication;
 
 public class TestData {
 
+	public static void main(String[] args) {
+		new TestData().testData();
+	}
+
 	@Test
 	public void testData() {
 		PropertyManager prop = new PropertyManager();

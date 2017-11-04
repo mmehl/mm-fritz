@@ -84,10 +84,19 @@ import mm.fritz.AuthenticationManager.Authentication;
 		    switch (isMinecraft) {
 		    case MINECRAFT_USER:
 				pw.println("<p>Passwort ok</p>");
-				if (db.tryStart(user)) {
+				Boolean tryStart = false;
+				try {
+					tryStart = db.tryStart(user);
+					if (!tryStart) {
+						pw.println("<p>Minecraft nur einmal am Tag starten :-)</p>");
+					}
+				} catch (Error e) {
+					pw.println("<p>DB failed: ");
+					pw.println(e.getMessage());
+					pw.println("</p>");
+				}
+				if (tryStart) {
 					enableMinecraft(user,pw,minutesBeforeReset);
-				} else {
-					pw.println("<p>Minecraft nur einmal am Tag starten :-)</p>");
 				}
 				break;
 		    case NO_MINECRAFT_USER:

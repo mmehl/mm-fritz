@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="mm-fritz" default="default" xmlns:ivy="antlib:org.apache.ivy.ant">
+	
+	<target name="default" depends="clean,war"/>
 
-	<target name="default" depends="clean,war">
-
+	<target name="test" depends="compile.test">
+		<junit printsummary="on" showoutput="on">
+		  <classpath>
+		  	<path refid="runtime.classpath"/>
+		  	<pathelement location="bin"/>
+		  </classpath>
+		  <formatter type="plain" usefile="off"/>
+		  <test name="mm.fritz.TestData"/>
+		</junit>
 	</target>
 
 	<target name="conf" description="retrieve dependencies with ivy">
@@ -12,8 +21,14 @@
 	<target name="resolve" depends="conf" description="retrieve dependencies with ivy">
 		<ivy:resolve />
 		<ivy:cachepath pathid="main.classpath" conf="compile"/>
-        <property name="d" refid="main.classpath"/>
+       <property name="d" refid="main.classpath"/>
 		<echo>main.classpath: ${d}</echo>
+
+		<ivy:cachepath pathid="runtime.classpath" conf="runtime"/>
+	       <property name="d" refid="runtime.classpath"/>
+		<echo>runtime.classpath: ${d}</echo>
+
+		
 		<ivy:cachefileset setid="runtime.fileset" conf="runtime"/>
         <property name="e" refid="runtime.fileset"/>
 		<echo>runtime.fileset: ${e}</echo>
@@ -36,6 +51,10 @@
 
 	<target name="compile" depends="resolve">
 		<javac srcdir="src" destdir="bin" classpathref="main.classpath" />
+	</target>
+
+	<target name="compile.test" depends="compile">
+		<javac srcdir="test" destdir="bin" classpathref="main.classpath" />
 	</target>
 
 	<target name="war" depends="compile,lib">
