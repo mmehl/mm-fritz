@@ -50,6 +50,7 @@
 	</target>
 
 	<target name="compile" depends="resolve">
+		<mkdir dir="bin" />
 		<javac srcdir="src" destdir="bin" classpathref="main.classpath" />
 	</target>
 
